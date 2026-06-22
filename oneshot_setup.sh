@@ -21,8 +21,13 @@ pkg install -y root-repo
 # 4. Install core dependencies
 pkg install -y git python wpa-supplicant pixiewps iw openssl
 
+
 # 5. Install sudo (replaces tsu if present)
 pkg install -y sudo
+
+# 5b. Install Termux Wi‑Fi connection helper (for auto‑connect)
+pkg install -y termux-wifi-connection
+
 
 # 6. Verify critical binaries are installed
 echo "[*] Verifying system binaries..."
