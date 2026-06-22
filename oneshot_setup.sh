@@ -21,25 +21,27 @@ pkg install -y root-repo
 # 4. Install core dependencies
 pkg install -y git python wpa-supplicant pixiewps iw openssl
 
-
 # 5. Install sudo (replaces tsu if present)
 pkg install -y sudo
 
-# 5b. Install Termux Wi‑Fi connection helper (for auto‑connect)
-pkg install -y termux-wifi-connection
+# 6. Install Termux API (provides termux-wifi-connection)
+pkg install -y termux-api
 
-
-# 6. Verify critical binaries are installed
+# 7. Verify critical binaries are installed
 echo "[*] Verifying system binaries..."
-for bin in iw wpa_supplicant pixiewps; do
+for bin in iw wpa_supplicant pixiewps termux-wifi-connection; do
     if ! command -v "$bin" &> /dev/null; then
-        echo "[!] ERROR: $bin not found in PATH after installation"
-        exit 1
+        echo "[!] WARNING: $bin not found in PATH after installation"
+        # termux-wifi-connection might not be in PATH until Termux:API app is installed
+        if [ "$bin" = "termux-wifi-connection" ]; then
+            echo "    Please install the Termux:API app from Play Store / F-Droid and restart Termux."
+        fi
+    else
+        echo "    ✓ $bin found"
     fi
-    echo "    ✓ $bin found"
 done
 
-# 7. Clone / update the AutoShot repository
+# 8. Clone / update the AutoShot repository
 ASH_HOME="$HOME/AutoShot"
 if [ -d "$ASH_HOME" ]; then
     echo "[*] AutoShot directory already exists. Pulling latest changes..."
@@ -56,13 +58,13 @@ else
     fi
 fi
 
-# 8. Check for pip3 availability
+# 9. Check for pip3 availability
 if ! command -v pip3 &> /dev/null; then
     echo "[!] ERROR: pip3 not found. Installing python-pip..."
     pkg install -y python-pip
 fi
 
-# 9. Install Python modules from requirements.txt
+# 10. Install Python modules from requirements.txt
 echo "[*] Installing Python dependencies..."
 if [ -f "$ASH_HOME/requirements.txt" ]; then
     if pip3 install -r "$ASH_HOME/requirements.txt"; then
@@ -75,12 +77,12 @@ else
     pip3 install wcwidth
 fi
 
-# 10. Make Python scripts executable
+# 11. Make Python scripts executable
 chmod +x "$ASH_HOME/oneshot.py"
 chmod +x "$ASH_HOME/auto_cracker.py"
 echo "    ✓ Scripts made executable"
 
-# 11. Verify setup completion
+# 12. Verify setup completion
 echo ""
 echo "✅ Setup complete!"
 echo ""
@@ -95,3 +97,4 @@ echo "   • Replace 'wlan0' with your actual Wi-Fi interface (use 'iw dev' to l
 echo "   • OneShot options: sudo python $ASH_HOME/oneshot.py -h"
 echo "   • AutoCracker options: sudo python $ASH_HOME/auto_cracker.py -h"
 echo "   • Test scan (no attacks): python $ASH_HOME/oneshot.py -i wlan0 --scan-only"
+echo "   • For auto‑connect, ensure the Termux:API app is installed on your Android device."
