@@ -1,1 +1,17 @@
+# Python Package Dependencies
+# Install with: pip install -r requirements.txt
 wcwidth>=0.2.0
+
+# System Dependencies (install via package manager):
+# 
+# Ubuntu/Debian:
+#   sudo apt-get install wpa-supplicant iw pixiewps
+#
+# Arch Linux:
+#   sudo pacman -S wpa_supplicant iw pixiewps
+#
+# Termux (Android):
+#   pkg install wpa-supplicant iw pixiewps
+#
+# Alpine:
+#   apk add wpa_supplicant iw pixiewps

@@ -1041,6 +1041,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delay', type=float, help='Delay between PIN attempts')
     parser.add_argument('-w', '--write', action='store_true', help='Save credentials on success')
     parser.add_argument('--iface-down', action='store_true', help='Bring interface down on exit')
+    parser.add_argument('--scan-only', action='store_true', help='Scan for WPS networks and exit')
     parser.add_argument('--vuln-list', default=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vulnwsc.txt'),
                         help='Vulnerable devices list file')
     parser.add_argument('-l', '--loop', action='store_true', help='Loop after each attack')
@@ -1056,6 +1057,24 @@ if __name__ == '__main__':
     # Check for root/admin privileges (Unix-like systems only)
     if hasattr(os, 'getuid') and os.getuid() != 0:
         die("Run as root (use sudo)")
+
+    # Handle --scan-only flag (no root required for scanning)
+    if args.scan_only:
+        try:
+            if not iface_up(args.interface):
+                die(f'Unable to bring up interface "{args.interface}"')
+            scanner = WiFiScanner(args.interface)
+            networks = scanner.iw_scanner()
+            if not networks:
+                print("No WPS networks found.")
+                sys.exit(0)
+            for idx, net in networks.items():
+                bssid = net['BSSID']
+                essid = net.get('ESSID', 'HIDDEN')
+                print(f"{bssid} {essid}")
+            sys.exit(0)
+        except Exception as e:
+            die(f"Scan error: {e}")
 
     # Check required binaries
     for bin_name in ['iw', 'wpa_supplicant', 'pixiewps']:
